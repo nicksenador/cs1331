@@ -104,23 +104,23 @@ public class PgnReader {
         switch (firstChar) {
         case 'N':
             movePiece(whitesTurn, firstChar,
-                movement.substring(1, movement.length() - 1));
+                movement.substring(1, movement.length()));
             break;
         case 'B':
             movePiece(whitesTurn, firstChar,
-                movement.substring(1, movement.length() - 1));
+                movement.substring(1, movement.length()));
             break;
         case 'R':
             movePiece(whitesTurn, firstChar,
-                movement.substring(1, movement.length() - 1));
+                movement.substring(1, movement.length()));
             break;
         case 'Q':
             movePiece(whitesTurn, firstChar,
-                movement.substring(1, movement.length() - 1));
+                movement.substring(1, movement.length()));
             break;
         case 'K':
             movePiece(whitesTurn, firstChar,
-                movement.substring(1, movement.length() - 1));
+                movement.substring(1, movement.length()));
             break;
         case 'O':
             break;
@@ -141,30 +141,52 @@ public class PgnReader {
         } else {
             piece = Character.toLowerCase(piece);
         }
+
         if (piece == 'p' || piece == 'P') {
             if (movement.charAt(1) != 'x') {
                 int column = determineColumn(movement.charAt(0));
                 int row = determineRow(movement.charAt(1));
                 if (whitesTurn) {
-                    if (board[row + 1][column] == String.valueOf(piece)) {
-                        rewriteBoard(row + 1, column, piece,
+                    if (board[row + 1][column].equals(String.valueOf(piece))) {
+                        writeToBoard(row + 1, column, piece,
                             row, column);
                     } else {
-                        rewriteBoard(row + 2, column, piece,
+                        writeToBoard(row + 2, column, piece,
                             row, column);
                     }
                 } else {
-                    System.out.println(movement);
-                    System.out.println(row);
-                    if (board[row - 1][column] == String.valueOf(piece)) {
-                        rewriteBoard(row - 1, column, piece,
+                    if (board[row - 1][column].equals(String.valueOf(piece))) {
+                        writeToBoard(row - 1, column, piece,
                             row, column);
                     } else {
-                        rewriteBoard(row - 2, column, piece,
+                        writeToBoard(row - 2, column, piece,
                             row, column);
                     }
                 }
-            } // TODO: implement x
+            } // TODO: implement x for pawn
+        }
+
+        if (piece == 'n' || piece == 'N') {
+            if (movement.indexOf("x") > -1) {
+                movement = movement.substring(movement.indexOf("x") + 1,
+                    movement.length());
+            }
+            int column = determineColumn(movement.charAt(0));
+            int row = determineRow(movement.charAt(1));
+            int[][] possibleOriginations = getKnightOriginations(row, column);
+            for (int i = 0; i < possibleOriginations.length; i++) {
+                int possibleRow = possibleOriginations[i][0];
+                int possibleColumn = possibleOriginations[i][1];
+                if (possibleRow >= 0 && possibleRow <= 7) {
+                    if (possibleColumn >= 0 && possibleColumn <= 7) {
+                        if (board[possibleRow][possibleColumn]
+                            .equals(String.valueOf(piece))) {
+                            writeToBoard(possibleRow, possibleColumn, piece,
+                                row, column);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -191,40 +213,41 @@ public class PgnReader {
 
     public static int determineRow(char row) {
         switch (row) {
-        case 1:
+        case '1':
             return 7;
-        case 2:
+        case '2':
             return 6;
-        case 3:
+        case '3':
             return 5;
-        case 4:
+        case '4':
             return 4;
-        case 5:
+        case '5':
             return 3;
-        case 6:
+        case '6':
             return 2;
-        case 7:
+        case '7':
             return 1;
         default:
             return 0;
         }
     }
 
-    public static void rewriteBoard(int deletedRow, int deletedColumn,
+    public static void writeToBoard(int deletedRow, int deletedColumn,
         char piece, int updatedRow, int updatedColumn) {
-        System.out.println(deletedRow + " " + deletedColumn + " " + piece + " " + updatedRow + " " + updatedColumn);
-        String[][] newBoard = new String[8][8];
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                if (i == deletedRow && j == deletedColumn) {
-                    newBoard[i][j] = "";
-                } else if (i == updatedRow && j == updatedColumn) {
-                    newBoard[i][j] = String.valueOf(piece);
-                } else {
-                    newBoard[i][j] = board[i][j];
-                }
-            }
-        }
-        board = newBoard;
+        board[deletedRow][deletedColumn] = "";
+        board[updatedRow][updatedColumn] = String.valueOf(piece);
+    }
+
+    public static int[][] getKnightOriginations(int row, int column) {
+        int[][] possibleOrigination = new int[8][2];
+        possibleOrigination[0] = new int[]{row - 1, column - 2};
+        possibleOrigination[1] = new int[]{row - 1, column + 2};
+        possibleOrigination[2] = new int[]{row - 2, column - 1};
+        possibleOrigination[3] = new int[]{row - 2, column + 1};
+        possibleOrigination[4] = new int[]{row + 1, column - 2};
+        possibleOrigination[5] = new int[]{row + 1, column + 2};
+        possibleOrigination[6] = new int[]{row + 2, column - 1};
+        possibleOrigination[7] = new int[]{row + 2, column + 1};
+        return possibleOrigination;
     }
 }
