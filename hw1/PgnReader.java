@@ -123,6 +123,7 @@ public class PgnReader {
                 movement.substring(1, movement.length()));
             break;
         case 'O':
+            performCastle(whitesTurn, movement);
             break;
         case 'a': case 'b': case 'c': case 'd':
         case 'e': case 'f': case 'g': case 'h':
@@ -163,7 +164,16 @@ public class PgnReader {
                             row, column);
                     }
                 }
-            } // TODO: implement x for pawn
+            } else {
+                int column = determineColumn(movement.charAt(2));
+                int row = determineRow(movement.charAt(3));
+                int originalColumn = determineColumn(movement.charAt(0));
+                int originalRow = row + 1;
+                if (!whitesTurn) {
+                    originalRow = row - 1;
+                }
+                writeToBoard(originalRow, originalColumn, piece, row, column);
+            }
         }
 
         if (piece == 'n' || piece == 'N') {
@@ -188,6 +198,102 @@ public class PgnReader {
                 }
             }
         }
+
+        if (piece == 'b' || piece == 'B') {
+            if (movement.indexOf("x") > -1) {
+                movement = movement.substring(movement.indexOf("x") + 1,
+                    movement.length());
+            }
+            int column = determineColumn(movement.charAt(0));
+            int row = determineRow(movement.charAt(1));
+            int[] possibleOrigination = checkTopLeft(row, column, piece);
+            if (possibleOrigination[0] == -1) {
+                possibleOrigination = checkTopRight(row, column, piece);
+                if (possibleOrigination[0] == -1) {
+                    possibleOrigination = checkBottomLeft(row, column, piece);
+                    if (possibleOrigination[0] == -1) {
+                        possibleOrigination = checkBottomRight(row, column,
+                            piece);
+                        if (possibleOrigination[0] == -1) {
+                            System.out.println("Error finding origin of "
+                                + "bishop movement: " + movement);
+                            System.exit(1);
+                        }
+                    }
+                }
+            }
+            int originalRow = possibleOrigination[0];
+            int originalColumn = possibleOrigination[1];
+            writeToBoard(originalRow, originalColumn, piece, row, column);
+        }
+
+        if (piece == 'r' || piece == 'R') {
+            if (movement.indexOf("x") > -1) {
+                movement = movement.substring(movement.indexOf("x") + 1,
+                    movement.length());
+            }
+            int column = determineColumn(movement.charAt(0));
+            int row = determineRow(movement.charAt(1));
+            int[] origination = getRookOrigination(row, column, piece);
+            if (origination[0] == -1) {
+                System.out.println("Error finding origin of rook movement: "
+                    + movement);
+                System.exit(1);
+            }
+            int originalRow = origination[0];
+            int originalColumn = origination[1];
+            writeToBoard(originalRow, originalColumn, piece, row, column);
+        }
+
+        if (piece == 'q' || piece == 'Q') {
+            if (movement.indexOf("x") > -1) {
+                movement = movement.substring(movement.indexOf("x") + 1,
+                    movement.length());
+            }
+            int column = determineColumn(movement.charAt(0));
+            int row = determineRow(movement.charAt(1));
+            int[] possibleOrigination = checkTopLeft(row, column, piece);
+            if (possibleOrigination[0] == -1) {
+                possibleOrigination = checkTopRight(row, column, piece);
+                if (possibleOrigination[0] == -1) {
+                    possibleOrigination = checkBottomLeft(row, column, piece);
+                    if (possibleOrigination[0] == -1) {
+                        possibleOrigination = checkBottomRight(row, column,
+                            piece);
+                        if (possibleOrigination[0] == -1) {
+                            possibleOrigination = getRookOrigination(row,
+                                column, piece);
+                            if (possibleOrigination[0] == -1) {
+                                System.out.println("Error finding origin of "
+                                    + "queen movement: " + movement);
+                                System.exit(1);
+                            }
+                        }
+                    }
+                }
+            }
+            int originalRow = possibleOrigination[0];
+            int originalColumn = possibleOrigination[1];
+            writeToBoard(originalRow, originalColumn, piece, row, column);
+        }
+
+        if (piece == 'k' || piece == 'K') {
+            if (movement.indexOf("x") > -1) {
+                movement = movement.substring(movement.indexOf("x") + 1,
+                    movement.length());
+            }
+            int column = determineColumn(movement.charAt(0));
+            int row = determineRow(movement.charAt(1));
+            int[] possibleOrigination = getKingOrigination(row, column, piece);
+            if (possibleOrigination[0] == -1) {
+                System.out.println("Error finding origin of king movement: "
+                    + movement);
+                System.exit(1);
+            }
+            int originalRow = possibleOrigination[0];
+            int originalColumn = possibleOrigination[1];
+            writeToBoard(originalRow, originalColumn, piece, row, column);
+        }
     }
 
     public static int determineColumn(char columnLetter) {
@@ -206,8 +312,12 @@ public class PgnReader {
             return 5;
         case 'g':
             return 6;
-        default:
+        case 'h':
             return 7;
+        default:
+            System.out.println("Error determining column: " + columnLetter);
+            System.exit(1);
+            return -1;
         }
     }
 
@@ -227,8 +337,12 @@ public class PgnReader {
             return 2;
         case '7':
             return 1;
-        default:
+        case '8':
             return 0;
+        default:
+            System.out.println("Error determining row: " + row);
+            System.exit(1);
+            return -1;
         }
     }
 
@@ -248,6 +362,183 @@ public class PgnReader {
         possibleOrigination[5] = new int[]{row + 1, column + 2};
         possibleOrigination[6] = new int[]{row + 2, column - 1};
         possibleOrigination[7] = new int[]{row + 2, column + 1};
+        return possibleOrigination;
+    }
+
+    public static int[] checkTopLeft(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        int i = row - 1;
+        int j = column - 1;
+        String testPiece = "";
+        while (i >= 0 && i <= 7 && j >= 0 && j <= 7) {
+            testPiece = board[i][j];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = j;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i -= 1;
+            j -= 1;
+        }
+        return possibleOrigination;
+    }
+
+    public static int[] checkTopRight(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        int i = row - 1;
+        int j = column + 1;
+        String testPiece = "";
+        while (i >= 0 && i <= 7 && j >= 0 && j <= 7) {
+            testPiece = board[i][j];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = j;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i -= 1;
+            j += 1;
+        }
+        return possibleOrigination;
+    }
+
+    public static int[] checkBottomLeft(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        int i = row + 1;
+        int j = column - 1;
+        String testPiece = "";
+        while (i >= 0 && i <= 7 && j >= 0 && j <= 7) {
+            testPiece = board[i][j];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = j;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i += 1;
+            j -= 1;
+        }
+        return possibleOrigination;
+    }
+
+    public static int[] checkBottomRight(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        int i = row + 1;
+        int j = column + 1;
+        String testPiece = "";
+        while (i >= 0 && i <= 7 && j >= 0 && j <= 7) {
+            testPiece = board[i][j];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = j;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i += 1;
+            j += 1;
+        }
+        return possibleOrigination;
+    }
+
+    public static int[] getRookOrigination(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        int i = row - 1;
+        String testPiece = "";
+        while (i >= 0 && i <= 7) {
+            testPiece = board[i][column];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = column;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i -= 1;
+        }
+        i = row + 1;
+        while (i >= 0 && i <= 7) {
+            testPiece = board[i][column];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = i;
+                possibleOrigination[1] = column;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i += 1;
+        }
+        i = column - 1;
+        while (i >= 0 && i <= 7) {
+            testPiece = board[row][i];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = row;
+                possibleOrigination[1] = i;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i -= 1;
+        }
+        i = column + 1;
+        while (i >= 0 && i <= 7) {
+            testPiece = board[row][i];
+            if (testPiece.equals(stringPiece)) {
+                possibleOrigination[0] = row;
+                possibleOrigination[1] = i;
+                return possibleOrigination;
+            } else if (!testPiece.equals("")) {
+                return possibleOrigination;
+            }
+            i += 1;
+        }
+        return possibleOrigination;
+    }
+
+    public static void performCastle(boolean whitesTurn, String movement) {
+        if (movement.contains("O-O-O")) {
+            if (whitesTurn) {
+                writeToBoard(7, 4, 'K', 7, 2);
+                writeToBoard(7, 0, 'R', 7, 3);
+            } else {
+                writeToBoard(0, 4, 'k', 0, 2);
+                writeToBoard(0, 0, 'r', 0, 3);
+            }
+        } else {
+            if (whitesTurn) {
+                writeToBoard(7, 4, 'K', 7, 6);
+                writeToBoard(7, 7, 'R', 7, 5);
+            } else {
+                writeToBoard(0, 4, 'k', 0, 6);
+                writeToBoard(0, 7, 'r', 0, 5);
+            }
+        }
+    }
+
+    public static int[] getKingOrigination(int row, int column, char piece) {
+        String stringPiece = String.valueOf(piece);
+        int[] possibleOrigination = {-1, -1};
+        for (int i = -1; i < 2; i++) {
+            for (int j = -1; j < 2; j++) {
+                if ((row + i) >= 0 && (row + i) <= 7) {
+                    if ((column + j) >= 0 && (column + j) <= 7) {
+                        if (board[row + i][column + j].equals(stringPiece)) {
+                            possibleOrigination[0] = row + i;
+                            possibleOrigination[1] = column + j;
+                        }
+                    }
+                }
+            }
+        }
         return possibleOrigination;
     }
 }
