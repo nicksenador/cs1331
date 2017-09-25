@@ -187,11 +187,6 @@ public class PgnReader {
                     enPassant = false;
                 }
             }
-            if (enPassantThisMove) {
-                enPassant = true;
-            } else {
-                enPassant = false;
-            }
         } else if (piece == 'n' || piece == 'N') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
@@ -282,6 +277,11 @@ public class PgnReader {
             int originalRow = possibleOrigination[0];
             int originalColumn = possibleOrigination[1];
             writeToBoard(originalRow, originalColumn, piece, row, column);
+        }
+        if (enPassantThisMove) {
+            enPassant = true;
+        } else {
+            enPassant = false;
         }
     }
 
