@@ -17,6 +17,8 @@ public class PgnReader {
         {"R", "N", "B", "Q", "K", "B", "N", "R"},
     };
 
+    private static boolean enPassant = false;
+
     public static void main(String[] args) {
         String game = fileContent(args[0]);
         System.out.println("Event: " + tagValue("Event", game));
@@ -137,21 +139,23 @@ public class PgnReader {
 
     public static void movePiece(boolean whitesTurn, char piece,
         String movement) {
-        if (whitesTurn) {
-            piece = Character.toUpperCase(piece);
-        } else {
-            piece = Character.toLowerCase(piece);
-        }
-
+        boolean enPassantThisMove = false;
+        piece = determinePieceCaps(piece, whitesTurn);
         if (piece == 'p' || piece == 'P') {
+            if (movement.contains("=")) {
+                piece = movement.charAt(movement.indexOf("=") + 1);
+                piece = determinePieceCaps(piece, whitesTurn);
+            }
             if (movement.charAt(1) != 'x') {
                 int column = determineColumn(movement.charAt(0));
                 int row = determineRow(movement.charAt(1));
                 if (whitesTurn) {
                     if (board[row + 1][column].equals(String.valueOf(piece))) {
+
                         writeToBoard(row + 1, column, piece,
                             row, column);
                     } else {
+                        enPassantThisMove = true;
                         writeToBoard(row + 2, column, piece,
                             row, column);
                     }
@@ -160,6 +164,7 @@ public class PgnReader {
                         writeToBoard(row - 1, column, piece,
                             row, column);
                     } else {
+                        enPassantThisMove = true;
                         writeToBoard(row - 2, column, piece,
                             row, column);
                     }
@@ -173,10 +178,21 @@ public class PgnReader {
                     originalRow = row - 1;
                 }
                 writeToBoard(originalRow, originalColumn, piece, row, column);
+                if (enPassant) {
+                    if (whitesTurn) {
+                        board[row + 1][column] = "";
+                    } else {
+                        board[row - 1][column] = "";
+                    }
+                    enPassant = false;
+                }
             }
-        }
-
-        if (piece == 'n' || piece == 'N') {
+            if (enPassantThisMove) {
+                enPassant = true;
+            } else {
+                enPassant = false;
+            }
+        } else if (piece == 'n' || piece == 'N') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
                     movement.length());
@@ -197,37 +213,24 @@ public class PgnReader {
                     }
                 }
             }
-        }
-
-        if (piece == 'b' || piece == 'B') {
+        } else if (piece == 'b' || piece == 'B') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
                     movement.length());
             }
             int column = determineColumn(movement.charAt(0));
             int row = determineRow(movement.charAt(1));
-            int[] possibleOrigination = checkTopLeft(row, column, piece);
+            int[] possibleOrigination = checkBishopOrigin(row, column, piece,
+                movement);
             if (possibleOrigination[0] == -1) {
-                possibleOrigination = checkTopRight(row, column, piece);
-                if (possibleOrigination[0] == -1) {
-                    possibleOrigination = checkBottomLeft(row, column, piece);
-                    if (possibleOrigination[0] == -1) {
-                        possibleOrigination = checkBottomRight(row, column,
-                            piece);
-                        if (possibleOrigination[0] == -1) {
-                            System.out.println("Error finding origin of "
-                                + "bishop movement: " + movement);
-                            System.exit(1);
-                        }
-                    }
-                }
+                System.out.println("Error finding origin of bishop movement: "
+                    + movement);
+                System.exit(1);
             }
             int originalRow = possibleOrigination[0];
             int originalColumn = possibleOrigination[1];
             writeToBoard(originalRow, originalColumn, piece, row, column);
-        }
-
-        if (piece == 'r' || piece == 'R') {
+        } else if (piece == 'r' || piece == 'R') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
                     movement.length());
@@ -243,41 +246,27 @@ public class PgnReader {
             int originalRow = origination[0];
             int originalColumn = origination[1];
             writeToBoard(originalRow, originalColumn, piece, row, column);
-        }
-
-        if (piece == 'q' || piece == 'Q') {
+        } else if (piece == 'q' || piece == 'Q') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
                     movement.length());
             }
             int column = determineColumn(movement.charAt(0));
             int row = determineRow(movement.charAt(1));
-            int[] possibleOrigination = checkTopLeft(row, column, piece);
+            int[] possibleOrigination = checkBishopOrigin(row, column, piece,
+                movement);
             if (possibleOrigination[0] == -1) {
-                possibleOrigination = checkTopRight(row, column, piece);
-                if (possibleOrigination[0] == -1) {
-                    possibleOrigination = checkBottomLeft(row, column, piece);
-                    if (possibleOrigination[0] == -1) {
-                        possibleOrigination = checkBottomRight(row, column,
-                            piece);
-                        if (possibleOrigination[0] == -1) {
-                            possibleOrigination = getRookOrigination(row,
-                                column, piece);
-                            if (possibleOrigination[0] == -1) {
-                                System.out.println("Error finding origin of "
-                                    + "queen movement: " + movement);
-                                System.exit(1);
-                            }
-                        }
-                    }
-                }
+                possibleOrigination = getRookOrigination(row, column, piece);
+            }
+            if (possibleOrigination[0] == -1) {
+                System.out.println("Error finding origin of queen movement: "
+                    + movement);
+                System.exit(1);
             }
             int originalRow = possibleOrigination[0];
             int originalColumn = possibleOrigination[1];
             writeToBoard(originalRow, originalColumn, piece, row, column);
-        }
-
-        if (piece == 'k' || piece == 'K') {
+        } else if (piece == 'k' || piece == 'K') {
             if (movement.indexOf("x") > -1) {
                 movement = movement.substring(movement.indexOf("x") + 1,
                     movement.length());
@@ -294,6 +283,15 @@ public class PgnReader {
             int originalColumn = possibleOrigination[1];
             writeToBoard(originalRow, originalColumn, piece, row, column);
         }
+    }
+
+    public static char determinePieceCaps(char piece, boolean whitesTurn) {
+        if (whitesTurn) {
+            piece = Character.toUpperCase(piece);
+        } else {
+            piece = Character.toLowerCase(piece);
+        }
+        return piece;
     }
 
     public static int determineColumn(char columnLetter) {
@@ -362,6 +360,25 @@ public class PgnReader {
         possibleOrigination[5] = new int[]{row + 1, column + 2};
         possibleOrigination[6] = new int[]{row + 2, column - 1};
         possibleOrigination[7] = new int[]{row + 2, column + 1};
+        return possibleOrigination;
+    }
+
+    public static int[] checkBishopOrigin(int row, int column, char piece,
+        String movement) {
+        int[] possibleOrigination = checkTopLeft(row, column, piece);
+        if (possibleOrigination[0] == -1) {
+            possibleOrigination = checkTopRight(row, column, piece);
+            if (possibleOrigination[0] == -1) {
+                possibleOrigination = checkBottomLeft(row, column, piece);
+                if (possibleOrigination[0] == -1) {
+                    possibleOrigination = checkBottomRight(row, column, piece);
+                    if (possibleOrigination[0] == -1) {
+                        possibleOrigination = getRookOrigination(row, column,
+                            piece);
+                    }
+                }
+            }
+        }
         return possibleOrigination;
     }
 
@@ -461,7 +478,7 @@ public class PgnReader {
                 possibleOrigination[1] = column;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                return possibleOrigination;
+                i = 8;
             }
             i -= 1;
         }
@@ -473,7 +490,7 @@ public class PgnReader {
                 possibleOrigination[1] = column;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                return possibleOrigination;
+                i = 8;
             }
             i += 1;
         }
@@ -485,7 +502,7 @@ public class PgnReader {
                 possibleOrigination[1] = i;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                return possibleOrigination;
+                i = 8;
             }
             i -= 1;
         }
@@ -497,7 +514,7 @@ public class PgnReader {
                 possibleOrigination[1] = i;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                return possibleOrigination;
+                i = 8;
             }
             i += 1;
         }
