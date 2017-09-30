@@ -69,7 +69,12 @@ public class PgnReader {
 
     public static String finalPosition(String gameInPgn) {
         String[] splitGame = gameInPgn.split("\\n1\\. ");
-        String[] moves = splitGame[1].split("\\s");
+        String[] moves;
+        if (splitGame.length == 2) {
+            moves = splitGame[1].split("\\s");
+        } else {
+            moves = splitGame[0].split("\\s");
+        }
         boolean whitesTurn = true;
         for (int i = 0; i < moves.length; i++) {
             if (!moves[i].contains(".")) {
@@ -478,7 +483,7 @@ public class PgnReader {
                 possibleOrigination[1] = column;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                i = 8;
+                i = 100;
             }
             i -= 1;
         }
@@ -490,7 +495,7 @@ public class PgnReader {
                 possibleOrigination[1] = column;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                i = 8;
+                i = 100;
             }
             i += 1;
         }
@@ -502,7 +507,7 @@ public class PgnReader {
                 possibleOrigination[1] = i;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                i = 8;
+                i = 100;
             }
             i -= 1;
         }
@@ -514,7 +519,7 @@ public class PgnReader {
                 possibleOrigination[1] = i;
                 return possibleOrigination;
             } else if (!testPiece.equals("")) {
-                i = 8;
+                i = 100;
             }
             i += 1;
         }
