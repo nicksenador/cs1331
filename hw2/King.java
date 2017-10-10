@@ -1,7 +1,17 @@
+/**
+ * Represents a King which is a piece on a chess board with a color.
+ *
+ * @author nsenador3
+ */
 public class King extends Piece {
 
     private static final String PIECE_NAME = "K";
 
+    /**
+     * Creates a King calling Piece's constructor to set color to passed value.
+     *
+     * @param color the color of this King
+     */
     public King(Color color) {
         super(color);
     }
