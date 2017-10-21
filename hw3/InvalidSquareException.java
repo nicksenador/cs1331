@@ -8,23 +8,14 @@
  */
 public class InvalidSquareException extends RuntimeException {
 
-    private String message;
-
     /**
-     * This is the constructor of InvalidSquareExcpetion which sets this.message
+     * This is the constructor of InvalidSquareExcpetion which calls the super
+     * constructor.
      *
      * @param message a string containing an invalid square.
      */
     public InvalidSquareException(String message) {
-        this.message = message;
+        super(message);
     }
 
-    /**
-     * Returns invalid square.
-     *
-     * @return a String containing the invalid square.
-     */
-    public String getMessage() {
-        return message;
-    }
 }
