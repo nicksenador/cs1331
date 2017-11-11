@@ -38,14 +38,47 @@ public class King extends Piece {
         String squareString = square.toString();
         char file = squareString.charAt(0);
         char rank = squareString.charAt(1);
-        squares[0] = new Square((char) (file - 1), (char) (rank - 1));
-        squares[1] = new Square(file, (char) (rank - 1));
-        squares[2] = new Square((char) (file + 1), (char) (rank - 1));
-        squares[3] = new Square((char) (file - 1), rank);
-        squares[4] = new Square((char) (file + 1), rank);
-        squares[5] = new Square((char) (file - 1), (char) (rank + 1));
-        squares[6] = new Square(file, (char) (rank + 1));
-        squares[7] = new Square((char) (file + 1), (char) (rank + 1));
+        try {
+            squares[0] = new Square((char) (file - 1), (char) (rank - 1));
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[1] = new Square(file, (char) (rank - 1));
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[2] = new Square((char) (file + 1), (char) (rank - 1));
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[3] = new Square((char) (file - 1), rank);
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[4] = new Square((char) (file + 1), rank);
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[5] = new Square((char) (file - 1), (char) (rank + 1));
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[6] = new Square(file, (char) (rank + 1));
+        } catch (Exception e) {
+            int i;
+        }
+        try {
+            squares[7] = new Square((char) (file + 1), (char) (rank + 1));
+
+        } catch (Exception e) {
+            int i;
+        }
         Square[] legalSquares = getLegalSquares(squares);
         return legalSquares;
     }

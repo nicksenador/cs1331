@@ -63,7 +63,11 @@ public abstract class Piece {
         String squareString;
         char file = '0';
         char rank = '0';
-        for (Square sq : squares) {
+        for (int i = 0; i < squares.length; i++) {
+            if (squares[i] == null) {
+                continue;
+            }
+            Square sq = squares[i];
             squareString = sq.toString();
             file = squareString.charAt(0);
             rank = squareString.charAt(1);
@@ -75,7 +79,11 @@ public abstract class Piece {
         }
         Square[] legalSquares = new Square[count];
         int legalSquaresIndex = 0;
-        for (Square sq : squares) {
+        for (int i = 0; i < squares.length; i++) {
+            if (squares[i] == null) {
+                continue;
+            }
+            Square sq = squares[i];
             squareString = sq.toString();
             file = squareString.charAt(0);
             rank = squareString.charAt(1);

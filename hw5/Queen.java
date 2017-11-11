@@ -40,18 +40,50 @@ public class Queen extends Piece {
         char rank = squareString.charAt(1);
         for (int i = 1; i < 8; i++) {
             int squaresIndex = ((i - 1) * 8);
-            squares[squaresIndex] = new Square((char) (file + i), rank);
-            squares[squaresIndex + 1] = new Square((char) (file + i),
-                (char) (rank + i));
-            squares[squaresIndex + 2] = new Square(file, (char) (rank + i));
-            squares[squaresIndex + 3] = new Square((char) (file - i),
-                (char) (rank + i));
-            squares[squaresIndex + 4] = new Square((char) (file - i), rank);
-            squares[squaresIndex + 5] = new Square((char) (file - i),
-                (char) (rank - i));
-            squares[squaresIndex + 6] = new Square(file, (char) (rank - i));
-            squares[squaresIndex + 7] = new Square((char) (file + i),
-                (char) (rank - i));
+            try {
+                squares[squaresIndex] = new Square((char) (file + i), rank);
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 1] = new Square((char) (file + i),
+                    (char) (rank + i));
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 2] = new Square(file, (char) (rank + i));
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 3] = new Square((char) (file - i),
+                    (char) (rank + i));
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 4] = new Square((char) (file - i), rank);
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 5] = new Square((char) (file - i),
+                    (char) (rank - i));
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 6] = new Square(file, (char) (rank - i));
+            } catch (Exception e) {
+                i = i;
+            }
+            try {
+                squares[squaresIndex + 7] = new Square((char) (file + i),
+                    (char) (rank - i));
+            } catch (Exception e) {
+                i = i;
+            }
         }
         Square[] legalSquares = getLegalSquares(squares);
         return legalSquares;

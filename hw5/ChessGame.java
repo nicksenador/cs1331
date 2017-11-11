@@ -40,8 +40,13 @@ public class ChessGame {
         return moves.get(n);
     }
 
-    // filters this class's list of moves
-    private List<Move> filter(Predicate<Move> filter) {
+    /**
+     * Returns a List of Moves filtered by the specifed Predicate
+     *
+     * @param filter a predicate defining what needs to be filtered
+     * @return a List of Moves filtered by filter
+     */
+    public List<Move> filter(Predicate<Move> filter) {
         List<Move> filteredMoves = new ArrayList<>();
         for (Move m : moves) {
             if (filter.test(m)) {
