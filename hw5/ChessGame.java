@@ -13,12 +13,12 @@ public class ChessGame {
     private List<Move> moves;
 
     /**
-     * Creates a ChessGame adding all moves to this class's List
+     * Creates a ChessGame setting moves to this class's List
      *
      * @param moves a list of Moves
      */
     public ChessGame(List<Move> moves) {
-        this.moves.addAll(moves);
+        this.moves = moves;
     }
 
     /**

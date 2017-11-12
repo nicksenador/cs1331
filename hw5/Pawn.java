@@ -34,7 +34,7 @@ public class Pawn extends Piece {
 
     @Override
     public Square[] movesFrom(Square square) {
-        Square[] squares = new Square[1];
+        Square[] squares = new Square[0];
         String squareString = square.toString();
         char file = squareString.charAt(0);
         char rank = squareString.charAt(1);
@@ -42,22 +42,48 @@ public class Pawn extends Piece {
         if (color == Color.WHITE) {
             if (rank == '2') {
                 squares = new Square[2];
-                squares[0] = new Square(file, (char) (rank + 1));
-                squares[1] = new Square(file, (char) (rank + 2));
+                try {
+                    squares[0] = new Square(file, (char) (rank + 1));
+                } catch (Exception e) {
+                    int i;
+                }
+                try {
+                    squares[1] = new Square(file, (char) (rank + 2));
+                } catch (Exception e) {
+                    int i;
+                }
             } else if (rank == '8') {
                 return squares;
             } else {
-                squares[0] = new Square(file, (char) (rank + 1));
+                squares = new Square[1];
+                try {
+                    squares[0] = new Square(file, (char) (rank + 1));
+                } catch (Exception e) {
+                    int i;
+                }
             }
         } else {
             if (rank == '7') {
                 squares = new Square[2];
-                squares[0] = new Square(file, (char) (rank - 1));
-                squares[1] = new Square(file, (char) (rank - 2));
+                try {
+                    squares[0] = new Square(file, (char) (rank - 1));
+                } catch (Exception e) {
+                    int i;
+                }
+                try {
+                    squares[1] = new Square(file, (char) (rank - 2));
+                } catch (Exception e) {
+                    int i;
+                }
             } else if (rank == '1') {
                 return squares;
             } else {
-                squares[0] = new Square(file, (char) (rank - 1));
+                squares = new Square[1];
+                try {
+                    squares[0] = new Square(file, (char) (rank - 1));
+                } catch (Exception e) {
+                    int i;
+                }
             }
         }
         return squares;
