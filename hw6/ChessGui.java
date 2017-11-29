@@ -1,7 +1,9 @@
 import java.util.ArrayList;
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.control.Alert;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
@@ -54,7 +56,9 @@ public class ChessGui extends Application {
                     createChessGameDialogBox(chessGame);
                 }
             });
-        viewGameButton.disarm();
+        viewGameButton.disableProperty()
+            .bind(Bindings.isNull(table.getSelectionModel()
+            .selectedItemProperty()));
 
         Button dismissButton = new Button("Dismiss");
         dismissButton.setOnAction((event) -> System.exit(0));
@@ -72,16 +76,7 @@ public class ChessGui extends Application {
     }
 
     private void createChessGameDialogBox(ChessGame chessGame) {
-        Stage stage = new Stage();
-
         ArrayList<String> arrayList = new ArrayList<>();
-        arrayList.add(chessGame.getEvent());
-        arrayList.add(chessGame.getSite());
-        arrayList.add(chessGame.getDate());
-        arrayList.add(chessGame.getWhite());
-        arrayList.add(chessGame.getBlack());
-        arrayList.add(chessGame.getResult());
-        arrayList.add("");
         int i = 1;
         try {
             while (true) {
@@ -94,9 +89,12 @@ public class ChessGui extends Application {
         ListView<String> listView = new ListView<>();
         listView.setItems(FXCollections.observableList(arrayList));
 
-        Scene scene = new Scene(listView);
-        stage.setScene(scene);
-        stage.setTitle(chessGame.getEvent());
-        stage.show();
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(chessGame.getEvent());
+        alert.setHeaderText(String.format("%s%n%s%n%s%n%s%n%s",
+            chessGame.getSite(), chessGame.getDate(), chessGame.getWhite(),
+            chessGame.getBlack(), chessGame.getResult()));
+        alert.setGraphic(listView);
+        alert.showAndWait();
     }
 }

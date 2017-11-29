@@ -1,16 +1,30 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Database of ChessGames which calls the constructor in ChessGame and add moves
+ * to ChessGames.
+ *
+ * @author nsenador3
+ * @version 1
+ */
 public class ChessDb {
 
     private List<ChessGame> games;
 
+    /**
+     * Constructor for ChessDb where ChessGames are stored in an ArrayList
+     */
     public ChessDb() {
         games = new ArrayList<>();
         games.add(morphyIsouard());
         games.add(talFischer());
     }
 
+    /**
+     * returns a List of the ChessGames in ChessDb
+     * @return List of type ChessGame of ChessGames in ChessDb
+     */
     public List<ChessGame> getGames() {
         return games;
     }
@@ -88,6 +102,5 @@ public class ChessDb {
         game.addMove("Nc4 b5");
         game.addMove("Ne5 1-0");
         return game;
-
     }
 }
